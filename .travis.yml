@@ -8,13 +8,17 @@ git:
 go:
   - 1.14.x
 
+env:
+  GO111MODULE=on
+
 notifications:
   email: false
 
 install:
   - . ./.travis_ninja.sh
   - go get -u github.com/roman-mazur/bood/cmd/bood
-
+  - go get -u  github.com/mdapathy/arch-design-2
+  - sudo npm -g install webpack webpack-cli --save-dev
 
 script:
   - cd $GOPATH/src/github.com/mdapathy/arch-design-2/build
