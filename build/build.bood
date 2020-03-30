@@ -1,0 +1,11 @@
+go_binary {
+  // Module (and output) name.
+  name: "boodtdma",
+
+  // Go package to build.
+  pkg: "github.com/mdapathy/arch-design-2/build/cmd/boodtdma",
+  //testPkg: "github.com/mdapathy/arch-design-2/...",
+
+  // Build inputs.
+  srcs: ["**/*.go", "../go.mod"],
+}
