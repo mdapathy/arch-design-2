@@ -1,0 +1,24 @@
+os: linux
+
+language: go
+
+git:
+  depth: 1
+
+go:
+  - 1.14.x
+
+notifications:
+  email: false
+
+install:
+  - . ./.travis_ninja.sh
+  - . ./.travis_bood.sh
+
+
+script:
+  - cd $GOPATH/src/github.com/mdapathy/arch-design-2/build
+  - bood
+  - rm build.bood
+  - mv build.boodtdma build.bood
+  - ./out/bin/boodtdma
