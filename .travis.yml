@@ -13,7 +13,7 @@ notifications:
 
 install:
   - . ./.travis_ninja.sh
-  - . ./.travis_bood.sh
+  - go get -u github.com/roman-mazur/bood/cmd/bood
 
 
 script:
