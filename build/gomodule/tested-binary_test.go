@@ -36,7 +36,7 @@ var fileSystems = []map[string][]byte{
 	{
 		"Blueprints": []byte(`
 			go_binary {
-			  name: "package-out",
+			  name: "new-package",
 			  pkg: ".",
               testPkg: ".",
 			  srcs: [ "main_test.go", "main.go",],
@@ -48,27 +48,23 @@ var fileSystems = []map[string][]byte{
 	},
 }
 
-var fileSystemsResults = [][]bool{
+var expectedOutput = [][]string{
 	{
-		true,
-		true,
-		true,
-		true,
-		false,
+		"out/bin/package-out:",
+		"g.gomodule.binaryBuild | main.go\n",
+		"out/reports/test.txt",
+		"g.gomodule.gotest | main_test.go main.go",
 	},
 	{
-		true,
-		true,
-		false,
-		false,
-		false,
+		"out/bin/package-out:",
+		"g.gomodule.binaryBuild | main.go\n",
 	},
 	{
-		true,
-		true,
-		true,
-		true,
-		true,
+		"out/bin/new-package",
+		"g.gomodule.binaryBuild | main.go vendor\n",
+		"build vendor: g.gomodule.vendor | go.mod\n",
+		"out/reports/test.txt",
+		"g.gomodule.gotest | main_test.go main.go",
 	},
 }
 
@@ -98,27 +94,11 @@ func TestTestedBinFactory(t *testing.T) {
 			} else {
 				text := buffer.String()
 				t.Logf("Gennerated ninja build file:\n%s", text)
-
-				//build rule
-				if strings.Contains(text, "out/bin/package-out:") != fileSystemsResults[index][0] {
-					t.Errorf("Generated ninja file does not have build of the test module")
-				}
-				if strings.Contains(text, " g.gomodule.binaryBuild | main.go") != fileSystemsResults[index][1] {
-					t.Errorf("Generated ninja file's build depends on test files too")
-				}
-
-				//test rule
-				if strings.Contains(text, "out/reports/test.txt") != fileSystemsResults[index][2] {
-					t.Errorf("Generated ninja file does not create test result's file")
-				}
-
-				if strings.Contains(text, "g.gomodule.gotest | main_test.go main.go") != fileSystemsResults[index][3] {
-					t.Errorf("Generated ninja file's test rule does not depend on all files")
-				}
-
-				//vendor rule
-				if strings.Contains(text, "build vendor: g.gomodule.vendor | go.mod") != fileSystemsResults[index][4] {
-					t.Errorf("Generated ninja file has a vendor build rule")
+				for _, expectedStr := range expectedOutput[index] {
+					//build rule
+					if strings.Contains(text, expectedStr) != true {
+						t.Errorf("Generated ninja file does not have expected string `%s`", expectedStr)
+					}
 				}
 
 			}
