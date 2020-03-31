@@ -11,6 +11,7 @@ const projection = meta => src => meta.reduce(
 
 // Display
 
+
 const max = items => Math.max(...items);
 const maxProp = key => items => max(items.map(x => x[key]));
 const maxLength = maxProp('length');

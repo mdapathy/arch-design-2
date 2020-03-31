@@ -7,18 +7,29 @@ git:
 
 go:
   - 1.14.x
+env:
+  GO111MODULE=on
 
 notifications:
   email: false
 
 install:
+  - sudo apt-get install npm
+  - sudo npm -g install webpack webpack-cli --save-dev
   - . ./.travis_ninja.sh
-  - go get -u github.com/roman-mazur/bood/cmd/bood
+  - cd $GOPATH/
+  - go get -u -insecure github.com/mdapathy/arch-design-2@v1.0.0 #insecure flag required to not have problems with google/blueprint
+  - cd $GOPATH/pkg/mod/github.com/mdapathy/arch-design-2@v1.0.0
+  - go install ./build/cmd/boodtdma/
 
+  # if that is not the way previous boodtdma version had to be installed
+  # there is .travis.yml present on dev2 where original bood is installed instead
 
 script:
   - cd $GOPATH/src/github.com/mdapathy/arch-design-2/build
-  - bood
+  - boodtdma
   - rm build.bood
   - mv build.boodtdma build.bood
   - ./out/bin/boodtdma
+  - cat ./out/js/my-script.js
+  - cat ./out/reports/test.txt

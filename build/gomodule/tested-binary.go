@@ -10,7 +10,7 @@ import (
 
 var (
 	// Package context used to define Ninja build rules.
-	pctx = blueprint.NewPackageContext("github.com/mdapathy/bood/gomodule")
+	pctx = blueprint.NewPackageContext("github.com/mdapathy/build/gomodule")
 
 	// Ninja rule to execute go build.
 	goBuild = pctx.StaticRule("binaryBuild", blueprint.RuleParams{
@@ -43,6 +43,7 @@ type testedBinaryModule struct {
 	}
 }
 
+
 func (tb *testedBinaryModule) GenerateBuildActions(ctx blueprint.ModuleContext) {
 	name := ctx.ModuleName()
 	config := bood.ExtractConfig(ctx)
@@ -51,26 +52,25 @@ func (tb *testedBinaryModule) GenerateBuildActions(ctx blueprint.ModuleContext) 
 	outputPath := path.Join(config.BaseOutputDir, "bin", name)
 	testOutput := path.Join(config.BaseOutputDir, "reports", "test.txt")
 
-	var inputs []string
-	var testlessinputs []string
-	inputErors := false
+	var testInputs []string
+	var buildInputs []string
+	inputErrors := false
 
 	for _, src := range tb.properties.Srcs {
 		if matches, err := ctx.GlobWithDeps(src, tb.properties.SrcsExclude); err == nil {
-			inputs = append(inputs, matches...)
+			testInputs = append(testInputs, matches...)
 			for _, i := range matches {
 				if val, _ := regexp.Match(".*_test\\.go$", []byte(i)); val == false {
-					testlessinputs = append(testlessinputs, i)
-
+					buildInputs = append(buildInputs, i)
 				}
 			}
 
 		} else {
 			ctx.PropertyErrorf("srcs", "Cannot resolve files that match pattern %s", src)
-			inputErors = true
+			inputErrors = true
 		}
 	}
-	if inputErors {
+	if inputErrors {
 		return
 	}
 
@@ -86,16 +86,19 @@ func (tb *testedBinaryModule) GenerateBuildActions(ctx blueprint.ModuleContext) 
 				"workDir": ctx.ModuleDir(),
 				"name":    name,
 			},
+
 		})
-		inputs = append(inputs, vendorDirPath)
+
+		buildInputs = append(buildInputs, vendorDirPath)
+		testInputs = append(testInputs, vendorDirPath)
 	}
 
 	ctx.Build(pctx, blueprint.BuildParams{
 		Description: fmt.Sprintf("Build %s as Go binary", name),
 		Rule:        goBuild,
 		Outputs:     []string{outputPath},
-		Implicits:   testlessinputs,
-		Optional:    true,
+		Implicits:   buildInputs,
+
 		Args: map[string]string{
 			"outputPath": outputPath,
 			"workDir":    ctx.ModuleDir(),
@@ -108,8 +111,7 @@ func (tb *testedBinaryModule) GenerateBuildActions(ctx blueprint.ModuleContext) 
 			Description: fmt.Sprintf("Test module %s", tb.properties.TestPkg),
 			Rule:        goTest,
 			Outputs:     []string{testOutput},
-			Implicits:   inputs,
-			Optional:    true,
+			Implicits:   testInputs,
 			Args: map[string]string{
 				"outputfile": testOutput,
 				"workDir":    ctx.ModuleDir(),

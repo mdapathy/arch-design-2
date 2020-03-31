@@ -4,6 +4,7 @@ import (
 	"flag"
 	"github.com/google/blueprint"
 	"github.com/mdapathy/arch-design-2/build/gomodule"
+	"github.com/mdapathy/arch-design-2/build/jsmodule"
 	boodmain "github.com/roman-mazur/bood"
 	"io/ioutil"
 	"log"
@@ -19,6 +20,7 @@ var (
 func NewContext() *blueprint.Context {
 	ctx := boodmain.PrepareContext()
 	ctx.RegisterModuleType("go_binary", gomodule.TestedBinFactory)
+	ctx.RegisterModuleType("js_bundle", jsmodule.JsMinimizedScriptFactory)
 	return ctx
 }
 
