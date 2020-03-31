@@ -7,19 +7,20 @@ const {console} = require('./console.js');
 
 {
     for (const element of iterable) {
-        console.dir({ element });
+        console.dir({element});
     }
+
 }
 
 {
     const array = Array.from(iterable);
-    console.log({ array });
+    console.log({array});
     console.log('-------------------------\n');
 }
 
 {
     const array = [...iterable];
-    console.dir({ array });
+    console.dir({array});
 }
 
 //end of iterable
@@ -32,10 +33,10 @@ const {projection, render} = require('./projection.js');
 
 // Dataset
 const persons = [
-    { name: 'Dasha', city: 'Kyiv', born: 2000 },
-    { name: 'Person1', city: 'Somewhere', born: 1994 },
-    { name: 'Tin', city: 'Odessa-mama', born: 1999 },
-    { name: 'Ya', city: 'Ungwar', born: 1596537 },
+    {name: 'Dasha', city: 'Kyiv', born: 2000},
+    {name: 'Person1', city: 'Somewhere', born: 1994},
+    {name: 'Tin', city: 'Odessa-mama', born: 1999},
+    {name: 'Ya', city: 'Ungwar', born: 1596537},
 ];
 // Metadata
 

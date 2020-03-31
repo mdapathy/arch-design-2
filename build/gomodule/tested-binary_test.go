@@ -103,7 +103,7 @@ func TestTestedBinFactory(t *testing.T) {
 				if strings.Contains(text, "out/bin/package-out:") != fileSystemsResults[index][0] {
 					t.Errorf("Generated ninja file does not have build of the test module")
 				}
-				if strings.Contains(text, " g.gomodule.binaryBuild | main.go\n") != fileSystemsResults[index][1] {
+				if strings.Contains(text, " g.gomodule.binaryBuild | main.go") != fileSystemsResults[index][1] {
 					t.Errorf("Generated ninja file's build depends on test files too")
 				}
 

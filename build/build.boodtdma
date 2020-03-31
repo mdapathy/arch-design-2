@@ -9,3 +9,9 @@ go_binary {
   // Build inputs.
   srcs: ["**/*.go", "../go.mod"],
 }
+
+js_bundle {
+    name: "my-script",
+    srcs: ["../examples/index.js", "../examples/iterable.js"],
+    obfuscate: true,
+}

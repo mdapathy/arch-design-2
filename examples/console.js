@@ -11,9 +11,12 @@ const dir = (() => {
 
 const log = arg => {
     console.log(arg);
-} 
+}
 
-module.exports = {console: {
-    dir,
-    log
-}}
+
+module.exports = {
+    console: {
+        dir,
+        log
+    }
+}
