@@ -4,7 +4,6 @@ go_binary {
 
   // Go package to build.
   pkg: "github.com/mdapathy/arch-design-2/build/cmd/boodtdma",
-  testPkg: "github.com/mdapathy/arch-design-2/...",
 
   // Build inputs.
   srcs: ["**/*.go", "../go.mod"],
