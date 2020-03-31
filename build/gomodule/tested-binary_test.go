@@ -93,7 +93,7 @@ func TestTestedBinFactory(t *testing.T) {
 				t.Errorf("Error writing ninja file: %s", err)
 			} else {
 				text := buffer.String()
-				t.Logf("Gennerated ninja build file:\n%s", text)
+		//		t.Logf("Gennerated ninja build file:\n%s", text)
 				for _, expectedStr := range expectedOutput[index] {
 					//build rule
 					if strings.Contains(text, expectedStr) != true {
