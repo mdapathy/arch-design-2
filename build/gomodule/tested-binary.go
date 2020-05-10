@@ -25,24 +25,24 @@ var (
 	}, "workDir", "name")
 
 	goTest = pctx.StaticRule("gotest", blueprint.RuleParams{
-		Command:     "cd ${workDir}  && go test -v ${pkg} > ${outputfile}",
+		Command:     "cd ${workDir}  && go test -v ${benchmark} ${pkg} > ${outputfile}",
 		Description: "test ${pkg}",
-	}, "workDir", "pkg", "outputfile")
+	}, "workDir", "pkg", "benchmark", "outputfile")
 )
 
 type testedBinaryModule struct {
 	blueprint.SimpleName
 
 	properties struct {
-		Name        string
-		Pkg         string
-		TestPkg     string
-		Srcs        []string
-		SrcsExclude []string
-		VendorFirst bool
+		Name           string
+		Pkg            string
+		TestPkg        string
+		Srcs           []string
+		SrcsExclude    []string
+		BenchmarkTimes string
+		VendorFirst    bool
 	}
 }
-
 
 func (tb *testedBinaryModule) GenerateBuildActions(ctx blueprint.ModuleContext) {
 	name := ctx.ModuleName()
@@ -86,33 +86,41 @@ func (tb *testedBinaryModule) GenerateBuildActions(ctx blueprint.ModuleContext) 
 				"workDir": ctx.ModuleDir(),
 				"name":    name,
 			},
-
 		})
 
 		buildInputs = append(buildInputs, vendorDirPath)
 		testInputs = append(testInputs, vendorDirPath)
 	}
 
-	ctx.Build(pctx, blueprint.BuildParams{
-		Description: fmt.Sprintf("Build %s as Go binary", name),
-		Rule:        goBuild,
-		Outputs:     []string{outputPath},
-		Implicits:   buildInputs,
+	if len(tb.properties.Srcs) > 0 && len(tb.properties.Pkg) > 0 {
+		ctx.Build(pctx, blueprint.BuildParams{
+			Description: fmt.Sprintf("Build %s as Go binary", name),
+			Rule:        goBuild,
+			Outputs:     []string{outputPath},
+			Implicits:   buildInputs,
 
-		Args: map[string]string{
-			"outputPath": outputPath,
-			"workDir":    ctx.ModuleDir(),
-			"pkg":        tb.properties.Pkg,
-		},
-	})
+			Args: map[string]string{
+				"outputPath": outputPath,
+				"workDir":    ctx.ModuleDir(),
+				"pkg":        tb.properties.Pkg,
+			},
+		})
+	}
 
 	if len(tb.properties.TestPkg) > 0 {
+		bench := "-bench=."
+
+		if len(tb.properties.BenchmarkTimes) > 0 {
+			bench += fmt.Sprintf(" -benchtime=%sx", tb.properties.BenchmarkTimes)
+		}
+
 		ctx.Build(pctx, blueprint.BuildParams{
 			Description: fmt.Sprintf("Test module %s", tb.properties.TestPkg),
 			Rule:        goTest,
 			Outputs:     []string{testOutput},
 			Implicits:   testInputs,
 			Args: map[string]string{
+				"benchmark":  bench,
 				"outputfile": testOutput,
 				"workDir":    ctx.ModuleDir(),
 				"pkg":        tb.properties.TestPkg,
